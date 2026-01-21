@@ -6,134 +6,179 @@
   <title>GÉIK Nyílt Nap – Szerencsekerék</title>
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #0f172a, #1e293b);
       color: white;
       text-align: center;
       padding: 20px;
-    }
-
-    h1 {
-      margin-bottom: 10px;
+      margin: 0;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
     canvas {
       background: white;
       border-radius: 50%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       margin: 20px 0;
+      max-width: 100%;
     }
 
-    button {
+    button#spin-btn {
       background: #22c55e;
       border: none;
-      padding: 14px 22px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #16a34a;
-      transform: scale(1.03);
-    }
-
-    .result {
-      margin-top: 15px;
+      padding: 16px 32px;
       font-size: 20px;
       font-weight: bold;
-      min-height: 40px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.3s;
+      color: white;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    button#spin-btn:hover {
+      background: #16a34a;
+      transform: scale(1.05);
+    }
+
+    button#spin-btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+
+    /* Modal (Kérdés ablak) stílusok */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    #question-card {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 20px;
+      border: 2px solid #38bdf8;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .option-btn {
+      background: #334155;
+      border: 1px solid #475569;
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 16px;
+    }
+
+    .option-btn:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
     }
 
     footer {
       opacity: 0.6;
       font-size: 14px;
-      margin-top: 30px;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎓 GÉIK Nyílt Nap Kihívás</h1>
-    <p>Pörgess, oldd meg a feladatot, és nyerj repi cuccot!</p>
 
-    <canvas id="wheel" width="350" height="350"></canvas>
+  <div class="container">
+    <h1>🎓 GÉIK Nyílt Nap</h1>
+    <p>Pörgess és válaszolj helyesen a <b>főnyereményért!</b></p>
+
+    <canvas id="wheel" width="400" height="400"></canvas>
 
     <div>
-      <button onclick="spin()">🎡 PÖRGETÉS</button>
+      <button id="spin-btn" onclick="spin()">🎡 PÖRGETÉS</button>
     </div>
 
-    <div class="result" id="result"></div>
+    <div id="result-text" style="margin-top:20px; font-size: 1.2rem; color: #38bdf8; height: 30px;"></div>
 
     <footer>
-      Készítve nyílt napra – telefonról is működik
+      Miskolci Egyetem - Gépészmérnöki és Informatikai Kar
     </footer>
   </div>
 
-  <script>
+  <div id="modal-overlay">
+    <div id="question-card">
+      <h3 id="modal-category" style="color: #fbbf24; margin-top: 0;">Kategória</h3>
+      <p id="modal-question" style="font-size: 18px; line-height: 1.5;">Kérdés szövege?</p>
+      <div class="options-grid" id="options-container">
+        </div>
+    </div>
+  </div>
+
+<script>
   const options = [
-    "🧠 Logikai kihívás",
-    "➕ Matek villám",
-    "💻 Programozós mini",
-    "⚙️ Gépész kérdés",
-    "😄 Fun kérdés",
-    "🔥 Extra nehéz (dupla nyeremény)",
-    "⚡ Villámkör (30 mp)",
-    "🎁 Szerencse – automatikus nyeremény"
+    "🧠 Logika", "➕ Matek", "💻 Infó", "⚙️ Gépész", 
+    "😄 Fun", "🔥 Extra", "⚡ Villám", "🎁 Szerencse"
   ];
 
-  // Kérdésbank kategóriánként
   const questions = {
-    "🧠 Logikai kihívás": [
-      { q: "Melyik szám hiányzik? 3 – 6 – 12 – 24 – ?", a: "48" },
-      { q: "Melyik nem illik a sorba: Egér, Billentyűzet, Monitor, Kenyérpirító", a: "Kenyérpirító" },
-      { q: "Ha minden GÉIK-es mérnök, és Anna GÉIK-es, akkor Anna mérnök? (igen/nem)", a: "igen" }
+    "🧠 Logika": [
+      { q: "Melyik szám hiányzik? 3 – 6 – 12 – 24 – ?", o: ["36", "48", "42", "60"], a: 1 },
+      { q: "Melyik nem illik a sorba?", o: ["Egér", "Monitor", "Kenyérpirító", "Billentyűzet"], a: 2 }
     ],
-    "➕ Matek villám": [
-      { q: "Mennyi 12 × 5?", a: "60" },
-      { q: "Mennyi 144 ÷ 12?", a: "12" },
-      { q: "Mennyi 2⁵?", a: "32" }
+    "➕ Matek": [
+      { q: "Mennyi 12 × 5?", o: ["50", "60", "70", "55"], a: 1 },
+      { q: "Mennyi 2 az ötödiken (2⁵)?", o: ["16", "32", "64", "10"], a: 1 }
     ],
-    "💻 Programozós mini": [
-      { q: "Mit jelent a CPU rövidítés?", a: "central processing unit" },
-      { q: "Melyik programozási nyelv: Python vagy HDMI?", a: "python" },
-      { q: "Mi a 0101 binárisan tízesben?", a: "5" }
+    "💻 Infó": [
+      { q: "Mit jelent a CPU?", o: ["Central Processing Unit", "Control Power Unit", "Computer Personal User", "Core Print Utility"], a: 0 },
+      { q: "Melyik egy programozási nyelv?", o: ["HTML", "JSON", "Python", "HTTP"], a: 2 }
     ],
-    "⚙️ Gépész kérdés": [
-      { q: "Melyik erősebb: acél vagy műanyag?", a: "acél" },
-      { q: "Mi a hűtés célja a számítógépben?", a: "ne melegedjen túl" },
-      { q: "Ha hosszabb a kar egy emelőn, több vagy kevesebb erő kell?", a: "kevesebb" }
+    "⚙️ Gépész": [
+      { q: "Melyik anyagnak legnagyobb a szakítószilárdsága?", o: ["Fa", "Réz", "Acél", "Ólom"], a: 2 },
+      { q: "Mire való a kenés a gépekben?", o: ["Hűtésre", "Súrlódás csökkentésére", "Tisztításra", "Díszítésre"], a: 1 }
     ],
-    "😄 Fun kérdés": [
-      { q: "Vizsgaidőszakban mi fontosabb: alvás vagy kávé? (bármelyik elfogadott)", a: "bármi" },
-      { q: "Hány kávé után működik egy egyetemista?", a: "bármi" }
+    "😄 Fun": [
+      { q: "Ki a mérnökök legjobb barátja?", o: ["A kávé", "A vizsgaszabályzat", "A hétfő reggel", "Az üres hűtő"], a: 0 },
+      { q: "Mikor fekszik le egy informatikus?", o: ["Este 10-kor", "Amikor elfogy a kód", "Napfelkeltekor", "Sosem"], a: 2 }
     ],
-    "🔥 Extra nehéz (dupla nyeremény)": [
-      { q: "Melyik prímszám: 21, 29 vagy 39?", a: "29" },
-      { q: "Mennyi: 2³ + 3²?", a: "17" }
+    "🔥 Extra": [
+      { q: "Mennyi a 2³ + 3²?", o: ["12", "15", "17", "21"], a: 2 },
+      { q: "Melyik prímszám?", o: ["21", "27", "29", "33"], a: 2 }
     ],
-    "⚡ Villámkör (30 mp)": [
-      { q: "Sorolj fel 3 tantárgyat, amit mérnökök tanulnak!", a: "bármi" }
-    ],
-    "🎁 Szerencse – automatikus nyeremény": []
+    "⚡ Villám": [
+      { q: "Hány bites egy bájt (byte)?", o: ["4", "8", "16", "32"], a: 1 }
+    ]
   };
 
   const canvas = document.getElementById("wheel");
   const ctx = canvas.getContext("2d");
+  const spinBtn = document.getElementById("spin-btn");
   const center = canvas.width / 2;
-  const radius = center - 10;
+  const radius = center - 15;
   let angle = 0;
   let spinning = false;
 
   function drawWheel() {
     const slice = (2 * Math.PI) / options.length;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     options.forEach((text, i) => {
       const start = angle + i * slice;
@@ -144,89 +189,113 @@
       ctx.arc(center, center, radius, start, end);
       ctx.fillStyle = i % 2 === 0 ? "#38bdf8" : "#fbbf24";
       ctx.fill();
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 2;
+      ctx.stroke();
 
       ctx.save();
       ctx.translate(center, center);
       ctx.rotate(start + slice / 2);
       ctx.textAlign = "right";
       ctx.fillStyle = "#000";
-      ctx.font = "14px sans-serif";
-      ctx.fillText(text, radius - 10, 5);
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText(text, radius - 15, 5);
       ctx.restore();
     });
 
-    // nyíl
-    ctx.fillStyle = "red";
+    // Fix nyíl (felül)
+    ctx.fillStyle = "#ef4444";
     ctx.beginPath();
-    ctx.moveTo(center - 10, 5);
-    ctx.lineTo(center + 10, 5);
-    ctx.lineTo(center, 25);
+    ctx.moveTo(center - 15, 10);
+    ctx.lineTo(center + 15, 10);
+    ctx.lineTo(center, 40);
     ctx.fill();
   }
 
   function spin() {
     if (spinning) return;
     spinning = true;
+    spinBtn.disabled = true;
+    document.getElementById("result-text").innerText = "Pörgés...";
 
-    let speed = Math.random() * 0.3 + 0.25;
+    let speed = Math.random() * 0.4 + 0.3;
     let decay = 0.985;
 
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       angle += speed;
       speed *= decay;
-
       drawWheel();
 
       if (speed > 0.002) {
         requestAnimationFrame(animate);
       } else {
         spinning = false;
-        showResult();
+        setTimeout(showResult, 500);
       }
     }
-
     animate();
   }
 
   function showResult() {
     const slice = (2 * Math.PI) / options.length;
-    const index = Math.floor(((2 * Math.PI - (angle % (2 * Math.PI))) % (2 * Math.PI)) / slice);
+    // A nyíl felül van, így a számítás:
+    const normalizedAngle = (1.5 * Math.PI - angle) % (2 * Math.PI);
+    const index = Math.floor((normalizedAngle < 0 ? normalizedAngle + 2 * Math.PI : normalizedAngle) / slice);
     const category = options[index];
 
-    document.getElementById("result").innerText = "Eredmény: " + category;
+    document.getElementById("result-text").innerText = "Kategória: " + category;
 
-    // Ha szerencse szegmens
-    if (category === "🎁 Szerencse – automatikus nyeremény") {
-      alert("🎉 Gratulálunk! Automatikusan nyertél egy ajándékot!");
+    if (category === "🎁 Szerencse") {
+      showFinalMessage(true, "A szerencse melléd állt! Automatikusan nyertél egy tornazsákot!");
       return;
     }
 
-    // Véletlen kérdés kiválasztása
     const list = questions[category];
-    if (!list || list.length === 0) return;
+    const qData = list[Math.floor(Math.random() * list.length)];
+    
+    openModal(category, qData);
+  }
 
-    const random = list[Math.floor(Math.random() * list.length)];
+  function openModal(cat, data) {
+    const overlay = document.getElementById("modal-overlay");
+    const catTitle = document.getElementById("modal-category");
+    const qText = document.getElementById("modal-question");
+    const optContainer = document.getElementById("options-container");
 
-    const userAnswer = prompt(category + "
+    catTitle.innerText = cat;
+    qText.innerText = data.q;
+    optContainer.innerHTML = "";
 
-" + random.q + "
+    data.o.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => {
+        overlay.style.display = "none";
+        if (i === data.a) {
+          showFinalMessage(true, "Gratulálunk! Helyes válasz!");
+        } else {
+          showFinalMessage(false, "Sajnos nem talált.");
+        }
+      };
+      optContainer.appendChild(btn);
+    });
 
-Válasz:");
-    if (userAnswer === null) return;
+    overlay.style.display = "flex";
+  }
 
-    // Kiértékelés (egyszerűsített)
-    const correct = random.a.toLowerCase();
-    const input = userAnswer.trim().toLowerCase();
-
-    if (correct === "bármi" || input.includes(correct)) {
-      alert("✅ Helyes! Jár a nyeremény! 🎁");
+  function showFinalMessage(isCorrect, msg) {
+    if (isCorrect) {
+      alert("✅ " + msg + "\n\nNyereményed: Egy tornazsák tele cuccokkal! 🎒");
     } else {
-      alert("❌ Nem teljesen jó. A helyes válasz: " + random.a);
+      alert("❌ " + msg + "\n\nNyereményed: Egy GÉIK-es toll! 🖊️");
     }
+    spinBtn.disabled = false;
+    document.getElementById("result-text").innerText = "";
   }
 
   drawWheel();
 </script>
+
 </body>
 </html>
