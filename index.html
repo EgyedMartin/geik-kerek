@@ -3,199 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GÉIK Nyílt Nap – 3 Kérdéses Kihívás</title>
+  <title>GÉIK Nyílt Nap Kihívás</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: sans-serif;
+      background: #0f172a;
       color: white;
       text-align: center;
-      padding: 10px;
       margin: 0;
+      padding: 10px;
     }
-
-    .container { max-width: 500px; margin: 0 auto; }
-
+    .container { max-width: 450px; margin: 0 auto; }
     canvas {
       background: white;
       border-radius: 50%;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       margin: 20px 0;
-      max-width: 90%;
+      max-width: 100%;
       height: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-
     button#spin-btn {
       background: #22c55e;
       border: none;
-      padding: 16px 32px;
+      padding: 15px 30px;
       font-size: 18px;
       font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
+      border-radius: 30px;
       color: white;
-      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+      cursor: pointer;
     }
-
-    button#spin-btn:disabled { background: #475569; opacity: 0.7; }
-
-    /* Modal / Kérdés ablak */
+    button:disabled { background: #475569; }
+    
+    /* Felugró ablak */
     #modal-overlay {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
     }
-
     #question-card {
       background: #1e293b;
-      padding: 25px;
-      border-radius: 20px;
+      padding: 20px;
+      border-radius: 15px;
       border: 2px solid #38bdf8;
-      width: 90%;
-      max-width: 400px;
+      width: 85%;
+      max-width: 350px;
     }
-
-    .options-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .option-btn, .prize-btn {
+    .options-grid { display: grid; gap: 10px; margin-top: 15px; }
+    .option-btn {
       background: #334155;
       border: 1px solid #475569;
       color: white;
       padding: 12px;
-      border-radius: 10px;
+      border-radius: 8px;
+      font-size: 15px;
       cursor: pointer;
-      font-size: 16px;
-      transition: 0.2s;
     }
-
-    .option-btn:hover, .prize-btn:hover { background: #38bdf8; color: #0f172a; font-weight: bold; }
-
-    .progress-dots { margin-bottom: 15px; font-weight: bold; color: #fbbf24; }
-
-    footer { opacity: 0.5; font-size: 12px; margin-top: 30px; }
+    .option-btn:active { background: #38bdf8; }
+    .progress { color: #fbbf24; font-weight: bold; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>🎓 GÉIK Kihívás</h1>
-    <p>Válaszolj <b>3 kérdésre</b> helyesen és <br>válassz egy ajándékot!</p>
+    <h2 style="margin-top:10px;">🎓 GÉIK Kihívás</h2>
+    <p>3 kérdés = 1 választható ajándék!</p>
 
     <canvas id="wheel" width="400" height="400"></canvas>
 
     <div>
       <button id="spin-btn" onclick="spin()">🎡 PÖRGETÉS</button>
     </div>
-
-    <div id="status" style="margin-top:15px; color: #38bdf8; font-weight: bold; min-height: 24px;"></div>
-
-    <footer>Miskolci Egyetem - Gépészmérnöki és Informatikai Kar</footer>
+    <p id="status" style="color:#38bdf8; font-weight:bold;"></p>
   </div>
 
   <div id="modal-overlay">
     <div id="question-card">
-      <div id="progress" class="progress-dots">Kérdés: 1 / 3</div>
-      <h3 id="m-cat" style="color: #38bdf8; margin: 0 0 10px 0; font-size: 16px; text-transform: uppercase;"></h3>
-      <p id="m-quest" style="font-size: 18px; min-height: 60px;"></p>
+      <div id="progress" class="progress">Kérdés: 1 / 3</div>
+      <p id="m-quest" style="font-size: 18px; font-weight: bold;"></p>
       <div class="options-grid" id="m-opts"></div>
     </div>
   </div>
 
 <script>
+  // Beállítások
   const options = ["🧠 Logika", "➕ Matek", "💻 Infó", "⚙️ Gépész", "😄 Fun", "🔥 Extra", "⚡ Villám", "🛠️ Technika"];
-  
   const prizes = ["Lehúzó", "Notesz", "Sörbontó", "GÉIK-es Toll", "Esőkabát", "Szövegkiemelő", "Tornazsák"];
 
   const questions = {
     "🧠 Logika": [
-      { q: "Melyik szám hiányzik? 3, 6, 12, 24, ...", o: ["36", "48", "42", "60"], a: 1 },
-      { q: "Ha két macska két egeret két perc alatt fog meg, hány macska fog meg tíz egeret tíz perc alatt?", o: ["10", "5", "2", "20"], a: 2 },
-      { q: "Melyik nem illik a sorba?", o: ["Monitor", "Billentyűzet", "Egér", "Kenyérpirító"], a: 3 }
+      { q: "Melyik szám jön: 2, 4, 8, 16... ?", o: ["24", "30", "32", "64"], a: 2 },
+      { q: "Melyik nem hardver?", o: ["Egér", "Monitor", "Windows", "RAM"], a: 2 },
+      { q: "Hány oldala van egy kockának?", o: ["4", "6", "8", "12"], a: 1 }
     ],
     "➕ Matek": [
-      { q: "Mennyi 12 x 5?", o: ["50", "60", "70", "55"], a: 1 },
-      { q: "Mennyi 144 gyöke?", o: ["12", "14", "11", "13"], a: 0 },
-      { q: "Mennyi 2 a tizediken (2¹⁰)?", o: ["512", "1000", "1024", "2048"], a: 2 }
+      { q: "Mennyi 15 x 4?", o: ["50", "60", "70", "45"], a: 1 },
+      { q: "Mennyi 100 gyöke?", o: ["10", "20", "50", "5"], a: 0 },
+      { q: "Mennyi 3 a négyzeten?", o: ["6", "9", "12", "3"], a: 1 }
     ],
     "💻 Infó": [
-      { q: "Mit jelent a CPU?", o: ["Central Processing Unit", "Computer Power", "Core Processor", "Control Unit"], a: 0 },
-      { q: "Melyik egy programozási nyelv?", o: ["HTML", "JSON", "Python", "HTTP"], a: 2 },
-      { q: "Hány bites 1 byte?", o: ["4", "8", "16", "32"], a: 1 }
+      { q: "Mit jelent a CPU?", o: ["Processzor", "Memória", "Monitor", "Egér"], a: 0 },
+      { q: "Melyik programnyelv?", o: ["HTML", "Python", "JPG", "MP3"], a: 1 },
+      { q: "Hány bit 1 byte?", o: ["4", "8", "16", "32"], a: 1 }
     ],
     "⚙️ Gépész": [
-      { q: "Melyik az erősebb anyag?", o: ["Réz", "Acél", "Alumínium", "Ólom"], a: 1 },
-      { q: "Mi csökkenti a súrlódást?", o: ["Homok", "Víz", "Kenőolaj", "Levegő"], a: 2 },
-      { q: "Melyik mérőeszköz a pontosabb?", o: ["Vonalzó", "Tolómérő", "Mérőszalag", "Szemmérték"], a: 1 }
+      { q: "Melyik fém?", o: ["Fa", "Műanyag", "Réz", "Üveg"], a: 2 },
+      { q: "Mi csökkenti a súrlódást?", o: ["Víz", "Olaj", "Por", "Gumi"], a: 1 },
+      { q: "Melyik keményebb?", o: ["Arany", "Acél", "Ólom", "Réz"], a: 1 }
     ],
     "😄 Fun": [
-      { q: "Ki a mérnökök legjobb barátja?", o: ["A kávé", "A hétfő", "A vizsgadrukk", "A sötétség"], a: 0 },
-      { q: "Hány óra alvás kell egy mérnökhallgatónak?", o: ["8 óra", "12 óra", "Amennyi marad", "0 óra"], a: 2 },
-      { q: "Mit csinál a gépész, ha elromlik valami?", o: ["Sír", "Megrúgja", "Szétszedi", "Kéri anyukáját"], a: 2 }
+      { q: "Mi kell a vizsgához?", o: ["Tudás", "Szerencse", "Kávé", "Mindhárom"], a: 3 },
+      { q: "Hol van a GÉIK?", o: ["Miskolc", "Pécs", "Győr", "Szeged"], a: 0 },
+      { q: "Ki a hallgató barátja?", o: ["Dékán", "Kávéautomata", "Hétfő", "Szomszéd"], a: 1 }
     ],
     "🔥 Extra": [
-      { q: "Mennyi 2³ + 3²?", o: ["12", "15", "17", "21"], a: 2 },
-      { q: "Melyik prímszám?", o: ["21", "27", "29", "33"], a: 2 },
-      { q: "Mi a pí (π) kerekített értéke?", o: ["3,12", "3,14", "3,16", "3,18"], a: 1 }
+      { q: "Mennyi 2^3?", o: ["6", "8", "9", "4"], a: 1 },
+      { q: "Mi a pí (π) eleje?", o: ["3,12", "3,14", "3,16", "3,10"], a: 1 },
+      { q: "Prímszám-e a 7?", o: ["Igen", "Nem", "Csak kedden", "Nem tudom"], a: 0 }
     ],
     "⚡ Villám": [
-      { q: "Mi a víz vegyjele?", o: ["HO2", "H2O", "O2", "H2"], a: 1 },
-      { q: "Melyik évszakban van a Nyílt Nap?", o: ["Tavasz", "Nyár", "Ősz", "Tél"], a: 3 },
-      { q: "Ki alapította a GÉIK-et? (Egyetem városa?)", o: ["Debrecen", "Miskolc", "Győr", "Pécs"], a: 1 }
+      { q: "Évszak most?", o: ["Tavasz", "Nyár", "Ősz", "Tél"], a: 3 },
+      { q: "Miskolci Egyetem színe?", o: ["Piros", "Kék-fehér", "Zöld", "Sárga"], a: 1 },
+      { q: "Mi a víz?", o: ["H2O", "CO2", "O2", "NaCl"], a: 0 }
     ],
     "🛠️ Technika": [
-      { q: "Mivel mérjük az áramerősséget?", o: ["Volt", "Amper", "Ohm", "Watt"], a: 1 },
-      { q: "Mi az USB teljes neve?", o: ["Universal Serial Bus", "Unit Star Board", "User Serial Blue", "Unit Serial Base"], a: 0 },
-      { q: "Hány kerék van egy autón alapból?", o: ["3", "4", "5 (pótkerékkel)", "6"], a: 1 }
+      { q: "Mivel mérünk ampert?", o: ["Mérőszalag", "Ampermérő", "Hőmérő", "Mérleg"], a: 1 },
+      { q: "USB jelentése?", o: ["Universal Bus", "Unit Base", "Ultra Speed", "User Board"], a: 0 },
+      { q: "Hány kereke van egy autónak?", o: ["2", "4", "6", "3"], a: 1 }
     ]
   };
 
   const canvas = document.getElementById("wheel");
   const ctx = canvas.getContext("2d");
   const spinBtn = document.getElementById("spin-btn");
-  const center = 200;
-  const radius = 185;
   let angle = 0;
   let spinning = false;
-
   let currentStep = 0;
-  let currentCategory = "";
+  let currentCat = "";
 
   function draw() {
     const slice = (Math.PI * 2) / options.length;
     ctx.clearRect(0, 0, 400, 400);
-
     options.forEach((text, i) => {
       ctx.beginPath();
-      ctx.moveTo(center, center);
-      ctx.arc(center, center, radius, angle + i * slice, angle + (i + 1) * slice);
+      ctx.moveTo(200, 200);
+      ctx.arc(200, 200, 190, angle + i * slice, angle + (i + 1) * slice);
       ctx.fillStyle = i % 2 === 0 ? "#38bdf8" : "#fbbf24";
       ctx.fill();
-      ctx.strokeStyle = "#1e293b";
-      ctx.lineWidth = 2;
       ctx.stroke();
-
       ctx.save();
-      ctx.translate(center, center);
+      ctx.translate(200, 200);
       ctx.rotate(angle + i * slice + slice / 2);
-      ctx.textAlign = "right";
       ctx.fillStyle = "#000";
-      ctx.font = "bold 13px Arial";
-      ctx.fillText(text, radius - 10, 5);
+      ctx.font = "bold 14px Arial";
+      ctx.fillText(text, 100, 5);
       ctx.restore();
     });
-
-    // Fix Nyíl
-    ctx.fillStyle = "#ef4444";
+    // Nyíl
+    ctx.fillStyle = "red";
     ctx.beginPath();
-    ctx.moveTo(center - 15, 5); ctx.lineTo(center + 15, 5); ctx.lineTo(center, 35);
+    ctx.moveTo(185, 10); ctx.lineTo(215, 10); ctx.lineTo(200, 40);
     ctx.fill();
   }
 
@@ -203,98 +174,78 @@
     if (spinning) return;
     spinning = true;
     spinBtn.disabled = true;
-    document.getElementById("status").innerText = "Pörgés...";
-    let speed = Math.random() * 0.35 + 0.3;
-    
+    let speed = Math.random() * 0.3 + 0.3;
     function anim() {
       angle += speed;
-      speed *= 0.982;
+      speed *= 0.985;
       draw();
       if (speed > 0.002) requestAnimationFrame(anim);
       else {
         spinning = false;
-        finishSpin();
+        setTimeout(getResult, 500);
       }
     }
     anim();
   }
 
-  function finishSpin() {
+  function getResult() {
     const slice = (Math.PI * 2) / options.length;
-    const normAngle = (1.5 * Math.PI - angle) % (Math.PI * 2);
-    const idx = Math.floor((normAngle < 0 ? normAngle + Math.PI * 2 : normAngle) / slice);
-    currentCategory = options[idx];
+    const norm = (1.5 * Math.PI - angle) % (Math.PI * 2);
+    const idx = Math.floor((norm < 0 ? norm + Math.PI * 2 : norm) / slice);
+    currentCat = options[idx];
     currentStep = 0;
-    
-    document.getElementById("status").innerText = "Kategória: " + currentCategory;
-    setTimeout(() => showQuestion(), 600);
+    showModal();
   }
 
-  function showQuestion() {
-    const overlay = document.getElementById("modal-overlay");
-    const catText = document.getElementById("m-cat");
-    const qText = document.getElementById("m-quest");
-    const progressText = document.getElementById("progress");
+  function showModal() {
+    document.getElementById("modal-overlay").style.display = "flex";
+    const qData = questions[currentCat][currentStep];
+    document.getElementById("progress").innerText = "Kérdés: " + (currentStep + 1) + " / 3";
+    document.getElementById("m-quest").innerText = qData.q;
     const container = document.getElementById("m-opts");
-
-    const qData = questions[currentCategory][currentStep];
-    
-    catText.innerText = currentCategory;
-    progressText.innerText = "Kérdés: " + (currentStep + 1) + " / 3";
-    qText.innerText = qData.q;
     container.innerHTML = "";
-
     qData.o.forEach((opt, i) => {
-      const b = document.createElement("button");
-      b.className = "option-btn";
-      b.innerText = opt;
-      b.onclick = () => checkAnswer(i, qData.a);
-      container.appendChild(b);
-    });
-
-    overlay.style.display = "flex";
-  }
-
-  function checkAnswer(selected, correct) {
-    if (selected === correct) {
-      currentStep++;
-      if (currentStep < 3) {
-        showQuestion();
-      } else {
-        showPrizePicker();
-      }
-    } else {
-      document.getElementById("modal-overlay").style.display = "none";
-      alert("❌ Sajnos tévesztettél! Most nem sikerült a 3/3, de próbáld újra később!");
-      spinBtn.disabled = false;
-    }
-  }
-
-  function showPrizePicker() {
-    const qText = document.getElementById("m-quest");
-    const container = document.getElementById("m-opts");
-    const progressText = document.getElementById("progress");
-
-    progressText.innerText = "🎯 GRATULÁLUNK! 3 / 3 HELYES!";
-    qText.innerText = "Sikeresen teljesítetted a kihívást! Válaszd ki a nyereményed:";
-    container.innerHTML = "";
-
-    prizes.forEach(prize => {
-      const b = document.createElement("button");
-      b.className = "prize-btn";
-      b.innerText = prize;
-      b.onclick = () => {
-        alert("🎉 Gratulálunk! A nyereményed: " + prize + ".\nKeresd a GÉIK standnál!");
-        document.getElementById("modal-overlay").style.display = "none";
-        spinBtn.disabled = false;
-        document.getElementById("status").innerText = "";
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if (i === qData.a) {
+          currentStep++;
+          if (currentStep < 3) showModal();
+          else showPrizes();
+        } else {
+          alert("Sajnos hibáztál! Kezdd újra a pörgetést.");
+          closeModal();
+        }
       };
-      container.appendChild(b);
+      container.appendChild(btn);
     });
   }
 
-  // Inicializálás
-  draw();
+  function showPrizes() {
+    document.getElementById("progress").innerText = "🎯 GRATULÁLUNK! 3/3";
+    document.getElementById("m-quest").innerText = "Válassz egy ajándékot:";
+    const container = document.getElementById("m-opts");
+    container.innerHTML = "";
+    prizes.forEach(p => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.style.background = "#22c55e";
+      btn.innerText = p;
+      btn.onclick = () => {
+        alert("Nyereményed: " + p + ". Mutasd fel ezt a képernyőt a standnál!");
+        closeModal();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function closeModal() {
+    document.getElementById("modal-overlay").style.display = "none";
+    spinBtn.disabled = false;
+  }
+
+  window.onload = draw;
 </script>
 </body>
 </html>
