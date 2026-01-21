@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GÉIK Nyílt Nap – Szerencsekerék</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin: 20px 0;
+    }
+
+    button {
+      background: #22c55e;
+      border: none;
+      padding: 14px 22px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #16a34a;
+      transform: scale(1.03);
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    footer {
+      opacity: 0.6;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎓 GÉIK Nyílt Nap Kihívás</h1>
+    <p>Pörgess, oldd meg a feladatot, és nyerj repi cuccot!</p>
+
+    <canvas id="wheel" width="350" height="350"></canvas>
+
+    <div>
+      <button onclick="spin()">🎡 PÖRGETÉS</button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <footer>
+      Készítve nyílt napra – telefonról is működik
+    </footer>
+  </div>
+
+  <script>
+  const options = [
+    "🧠 Logikai kihívás",
+    "➕ Matek villám",
+    "💻 Programozós mini",
+    "⚙️ Gépész kérdés",
+    "😄 Fun kérdés",
+    "🔥 Extra nehéz (dupla nyeremény)",
+    "⚡ Villámkör (30 mp)",
+    "🎁 Szerencse – automatikus nyeremény"
+  ];
+
+  // Kérdésbank kategóriánként
+  const questions = {
+    "🧠 Logikai kihívás": [
+      { q: "Melyik szám hiányzik? 3 – 6 – 12 – 24 – ?", a: "48" },
+      { q: "Melyik nem illik a sorba: Egér, Billentyűzet, Monitor, Kenyérpirító", a: "Kenyérpirító" },
+      { q: "Ha minden GÉIK-es mérnök, és Anna GÉIK-es, akkor Anna mérnök? (igen/nem)", a: "igen" }
+    ],
+    "➕ Matek villám": [
+      { q: "Mennyi 12 × 5?", a: "60" },
+      { q: "Mennyi 144 ÷ 12?", a: "12" },
+      { q: "Mennyi 2⁵?", a: "32" }
+    ],
+    "💻 Programozós mini": [
+      { q: "Mit jelent a CPU rövidítés?", a: "central processing unit" },
+      { q: "Melyik programozási nyelv: Python vagy HDMI?", a: "python" },
+      { q: "Mi a 0101 binárisan tízesben?", a: "5" }
+    ],
+    "⚙️ Gépész kérdés": [
+      { q: "Melyik erősebb: acél vagy műanyag?", a: "acél" },
+      { q: "Mi a hűtés célja a számítógépben?", a: "ne melegedjen túl" },
+      { q: "Ha hosszabb a kar egy emelőn, több vagy kevesebb erő kell?", a: "kevesebb" }
+    ],
+    "😄 Fun kérdés": [
+      { q: "Vizsgaidőszakban mi fontosabb: alvás vagy kávé? (bármelyik elfogadott)", a: "bármi" },
+      { q: "Hány kávé után működik egy egyetemista?", a: "bármi" }
+    ],
+    "🔥 Extra nehéz (dupla nyeremény)": [
+      { q: "Melyik prímszám: 21, 29 vagy 39?", a: "29" },
+      { q: "Mennyi: 2³ + 3²?", a: "17" }
+    ],
+    "⚡ Villámkör (30 mp)": [
+      { q: "Sorolj fel 3 tantárgyat, amit mérnökök tanulnak!", a: "bármi" }
+    ],
+    "🎁 Szerencse – automatikus nyeremény": []
+  };
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+  const center = canvas.width / 2;
+  const radius = center - 10;
+  let angle = 0;
+  let spinning = false;
+
+  function drawWheel() {
+    const slice = (2 * Math.PI) / options.length;
+
+    options.forEach((text, i) => {
+      const start = angle + i * slice;
+      const end = start + slice;
+
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, radius, start, end);
+      ctx.fillStyle = i % 2 === 0 ? "#38bdf8" : "#fbbf24";
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(center, center);
+      ctx.rotate(start + slice / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#000";
+      ctx.font = "14px sans-serif";
+      ctx.fillText(text, radius - 10, 5);
+      ctx.restore();
+    });
+
+    // nyíl
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(center - 10, 5);
+    ctx.lineTo(center + 10, 5);
+    ctx.lineTo(center, 25);
+    ctx.fill();
+  }
+
+  function spin() {
+    if (spinning) return;
+    spinning = true;
+
+    let speed = Math.random() * 0.3 + 0.25;
+    let decay = 0.985;
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      angle += speed;
+      speed *= decay;
+
+      drawWheel();
+
+      if (speed > 0.002) {
+        requestAnimationFrame(animate);
+      } else {
+        spinning = false;
+        showResult();
+      }
+    }
+
+    animate();
+  }
+
+  function showResult() {
+    const slice = (2 * Math.PI) / options.length;
+    const index = Math.floor(((2 * Math.PI - (angle % (2 * Math.PI))) % (2 * Math.PI)) / slice);
+    const category = options[index];
+
+    document.getElementById("result").innerText = "Eredmény: " + category;
+
+    // Ha szerencse szegmens
+    if (category === "🎁 Szerencse – automatikus nyeremény") {
+      alert("🎉 Gratulálunk! Automatikusan nyertél egy ajándékot!");
+      return;
+    }
+
+    // Véletlen kérdés kiválasztása
+    const list = questions[category];
+    if (!list || list.length === 0) return;
+
+    const random = list[Math.floor(Math.random() * list.length)];
+
+    const userAnswer = prompt(category + "
+
+" + random.q + "
+
+Válasz:");
+    if (userAnswer === null) return;
+
+    // Kiértékelés (egyszerűsített)
+    const correct = random.a.toLowerCase();
+    const input = userAnswer.trim().toLowerCase();
+
+    if (correct === "bármi" || input.includes(correct)) {
+      alert("✅ Helyes! Jár a nyeremény! 🎁");
+    } else {
+      alert("❌ Nem teljesen jó. A helyes válasz: " + random.a);
+    }
+  }
+
+  drawWheel();
+</script>
+</body>
+</html>
