@@ -50,42 +50,98 @@
     "Logika": [
       { q: "Melyik szám jön: 2, 4, 8, 16... ?", o: ["24", "30", "32", "64"], a: 2 },
       { q: "Melyik nem illik a sorba?", o: ["Egér", "Monitor", "Kenyérpirító", "RAM"], a: 2 },
-      { q: "Hány oldala van egy kockának?", o: ["4", "6", "8", "12"], a: 1 }
+      { q: "Hány oldala van egy kockának?", o: ["4", "6", "8", "12"], a: 1 },
+      { q: "Egy farmernek 17 birkája van, 9 kivételével mind elpusztul. Hány marad?", o: ["8", "9", "17", "0"], a: 1 },
+      { q: "Melyik hónapban van 28 nap?", o: ["Csak februárban", "Mindegyikben", "Szökőévben", "Egyikben sem"], a: 1 },
+      { q: "Anya és apa 4 lányának mindegyikének van egy bátyja. Hányan vannak a gyerekek?", o: ["5", "8", "4", "9"], a: 0 },
+      { q: "Melyik nehezebb: 1kg toll vagy 1kg vas?", o: ["A vas", "A toll", "Egyformák", "A vas, mert sűrűbb"], a: 2 },
+      { q: "Ha egy lila házat kék téglából, egy sárga házat zöldből építenek, miből van az üvegház?", o: ["Üvegből", "Átlátszó téglából", "Műanyagból", "Fehér téglából"], a: 0 },
+      { q: "Melyik az a szám, amit ha megszorzol bármivel, az eredmény ugyanannyi marad?", o: ["1", "0", "10", "Végtelen"], a: 1 },
+      { q: "Hány betű van az ABC-ben?", o: ["44", "3", "26", "32"], a: 1 } // (A-B-C -> 3 betű, ez egy klasszikus beugratós)
     ],
     "Matek": [
       { q: "Mennyi 15 x 4?", o: ["50", "60", "70", "45"], a: 1 },
       { q: "Mennyi 144 gyöke?", o: ["12", "14", "11", "10"], a: 0 },
-      { q: "Mennyi 2 a tizediken (2^10)?", o: ["512", "1000", "1024", "2048"], a: 2 }
+      { q: "Mennyi 2 a tizediken (2^10)?", o: ["512", "1000", "1024", "2048"], a: 2 },
+      { q: "Mivel egyenlő a sin(90°)?", o: ["0", "0,5", "1", "-1"], a: 2 },
+      { q: "Hány fok a háromszög belső szögeinek összege?", o: ["90°", "180°", "360°", "270°"], a: 1 },
+      { q: "Mi a 25% tört alakban?", o: ["1/2", "1/5", "1/4", "1/3"], a: 2 },
+      { q: "Mennyi 7x8?", o: ["54", "56", "62", "64"], a: 1 },
+      { q: "Mi a kör kerületének képlete?", o: ["r^2*pi", "2*r*pi", "d*r", "2*r^2"], a: 1 },
+      { q: "Mennyi a 0 faktoriálisa (0!)?", o: ["0", "Végtelen", "1", "-1"], a: 2 },
+      { q: "Hány éle van egy téglatestnek?", o: ["6", "8", "10", "12"], a: 3 }
     ],
     "Infó": [
       { q: "Mit jelent a CPU?", o: ["Processzor", "Memória", "Monitor", "Táp"], a: 0 },
       { q: "Melyik programnyelv?", o: ["HTML", "Python", "JPG", "MP3"], a: 1 },
-      { q: "Hány bit 1 byte?", o: ["4", "8", "16", "32"], a: 1 }
+      { q: "Hány bit 1 byte?", o: ["4", "8", "16", "32"], a: 1 },
+      { q: "Mi az operációs rendszer feladata?", o: ["Játékfuttatás", "Hardverkezelés", "Internetezés", "Zenehallgatás"], a: 1 },
+      { q: "Melyik egy felhő alapú tárhely?", o: ["Google Drive", "Photoshop", "Excel", "Spotify"], a: 0 },
+      { q: "Mit jelent a RAM rövidítés?", o: ["Read Access Memory", "Random Access Memory", "Real Action Mode", "Rapid Area Memory"], a: 1 },
+      { q: "Melyik billentyűkombináció a MÁSOLÁS?", o: ["Ctrl+X", "Ctrl+V", "Ctrl+C", "Ctrl+Z"], a: 2 },
+      { q: "Mi a legkisebb adategység az informatikában?", o: ["Byte", "Bit", "Kilobyte", "Pixel"], a: 1 },
+      { q: "Melyik cég készíti a Windows-t?", o: ["Apple", "Google", "Microsoft", "Linux"], a: 2 },
+      { q: "Mi az URL?", o: ["E-mail cím", "Webcím", "Processzor típus", "Adatbázis"], a: 1 }
     ],
     "Gépész": [
       { q: "Melyik fém?", o: ["Fa", "Műanyag", "Acél", "Üveg"], a: 2 },
       { q: "Mi csökkenti a súrlódást?", o: ["Víz", "Kenőolaj", "Por", "Gumi"], a: 1 },
-      { q: "Mivel mérünk pontosabban?", o: ["Tolómérő", "Vonalzó", "Mérőszalag", "Szem"], a: 0 }
+      { q: "Mivel mérünk pontosabban?", o: ["Tolómérő", "Vonalzó", "Mérőszalag", "Szem"], a: 0 },
+      { q: "Mi a sűrűség mértékegysége?", o: ["kg/m3", "m/s2", "Newton", "Pascal"], a: 0 },
+      { q: "Melyik gépalkatrész továbbít forgómozgást?", o: ["Dugattyú", "Tengely", "Rugó", "Alátét"], a: 1 },
+      { q: "Mit jelent a korrózió?", o: ["Keményedés", "Rozsdásodás", "Olvadás", "Párolgás"], a: 1 },
+      { q: "Melyik eljárás az acél keményítése?", o: ["Hegesztés", "Edzés", "Forgácsolás", "Öntés"], a: 1 },
+      { q: "Mire való a lendkerék?", o: ["Hűtésre", "Egyenletes járás biztosítására", "Fékezésre", "Kenésre"], a: 1 },
+      { q: "Melyik anyagnak a legjobb a hővezetése?", o: ["Réz", "Fa", "Műanyag", "Üveg"], a: 0 },
+      { q: "Hány ütemű lehet egy belső égésű motor?", o: ["Csak 4", "Csak 2", "2 vagy 4", "Bármennyi"], a: 2 }
     ],
     "Fun": [
       { q: "Mi kell a vizsgához leginkább?", o: ["Szerencse", "Kávé", "Tudás", "Mindhárom"], a: 3 },
       { q: "Hol található a GÉIK?", o: ["Budapest", "Miskolc", "Debrecen", "Győr"], a: 1 },
-      { q: "Ki a mérnökhallgató barátja?", o: ["A hétfő", "A kávéautomata", "A vizsgadrukk", "Az üres hűtő"], a: 1 }
+      { q: "Ki a mérnökhallgató barátja?", o: ["A hétfő", "A kávéautomata", "A vizsgadrukk", "Az üres hűtő"], a: 1 },
+      { q: "Mi a mérnökök nem hivatalos eledele?", o: ["Pizza", "Instant tészta", "Zsíroskenyér", "Saláta"], a: 1 },
+      { q: "Mikor a legaktívabb egy egyetemista?", o: ["Hétfő reggel", "Vizsga előtt 1 órával", "Szombat délben", "Augusztusban"], a: 1 },
+      { q: "Hány kávé után látja egy mérnök a mátrixot?", o: ["1", "3", "Az 5. után", "Csak energiaitaltól"], a: 2 },
+      { q: "Mi a teendő, ha nem indul a kód/gép?", o: ["Sírni", "Újraindítani", "Megrúgni", "Kérdezni a ChatGPT-t"], a: 1 },
+      { q: "Melyik nap a legnehezebb az egyetemen?", o: ["Hétfő", "Kedd", "Amelyiken ZH van", "Péntek"], a: 2 },
+      { q: "Hány órát alszik átlagosan egy mérnökhallgató vizsgaidőszakban?", o: ["8", "10", "4", "Nem alszik"], a: 3 },
+      { q: "Mi a legfontosabb eszköz a menzán?", o: ["Villa", "Kanál", "Türelem", "Diákigazolvány"], a: 3 }
     ],
     "Extra": [
       { q: "Mennyi 2^3 + 3^2?", o: ["12", "17", "15", "18"], a: 1 },
       { q: "Mi a pí (π) kerekített értéke?", o: ["3,12", "3,14", "3,16", "3,10"], a: 1 },
-      { q: "Prímszám-e a 29?", o: ["Igen", "Nem", "Csak páratlan napokon", "Nem tudom"], a: 0 }
+      { q: "Prímszám-e a 29?", o: ["Igen", "Nem", "Csak páratlan napokon", "Nem tudom"], a: 0 },
+      { q: "Ki volt az elektromosság úttörője?", o: ["Nikola Tesla", "Isaac Newton", "Albert Einstein", "Charles Darwin"], a: 0 },
+      { q: "Mennyi a fénysebesség kerekítve?", o: ["300.000 km/s", "150.000 km/s", "1.000.000 km/s", "500 km/h"], a: 0 },
+      { q: "Hány bolygó van a Naprendszerben?", o: ["7", "8", "9", "10"], a: 1 },
+      { q: "Ki fedezte fel a gravitációt?", o: ["Tesla", "Galilei", "Newton", "Copernicus"], a: 2 },
+      { q: "Melyik elem vegyjele az Au?", o: ["Ezüst", "Arany", "Alumínium", "Réz"], a: 1 },
+      { q: "Hány fokon forr a víz normál légnyomáson?", o: ["90°C", "100°C", "110°C", "120°C"], a: 1 },
+      { q: "Mi az abszolút nulla fok értéke Celsiusban?", o: ["0°C", "-100°C", "-273°C", "-500°C"], a: 2 }
     ],
     "Villám": [
       { q: "Mi a víz vegyjele?", o: ["HO2", "H2O", "O2", "H2"], a: 1 },
       { q: "Miskolci Egyetem színe?", o: ["Zöld", "Piros", "Kék-fehér", "Sárga"], a: 2 },
-      { q: "Hány bites egy IP cím (IPv4)?", o: ["16", "32", "64", "128"], a: 1 }
+      { q: "Melyik évben járunk?", o: ["2024", "2025", "2026", "2023"], a: 2 },
+      { q: "Ki a kar dékánja?", o: ["Dr. Siménfalvi Zoltán", "Steve Jobs", "Bill Gates", "Elon Musk"], a: 0 },
+      { q: "Hány napból áll egy átlagos év?", o: ["364", "365", "366", "360"], a: 1 },
+      { q: "Hogy hívják az egyetem kabalaállatát?", o: ["Maci", "Selmeci Diák", "Gépész Róka", "Bagoly"], a: 1 },
+      { q: "Melyik városban van az egyetem?", o: ["Miskolc", "Tapolca", "Diósgyőr", "Lillafüred"], a: 0 },
+      { q: "Mi a GÉIK rövidítés vége?", o: ["Informatikai Kar", "Ipari Kar", "Intézeti Központ", "Innovációs Kar"], a: 0 },
+      { q: "Hány kara van a Miskolci Egyetemnek?", o: ["4", "6", "8", "10"], a: 2 },
+      { q: "Melyik kerületben van az Egyetemváros?", o: ["Miskolc-Tapolca mellett", "Belváros", "Avas", "Egyetemváros"], a: 3 }
     ],
     "Technika": [
       { q: "Mivel mérünk ampert?", o: ["Voltmérő", "Ampermérő", "Hőmérő", "Mérleg"], a: 1 },
       { q: "Mi az USB?", o: ["Universal Serial Bus", "Unit Base", "Ultra Speed", "User Board"], a: 0 },
-      { q: "Hány kerék van egy autón?", o: ["2", "3", "4", "5"], a: 2 }
+      { q: "Hány kerék van egy autón?", o: ["2", "3", "4", "5"], a: 2 },
+      { q: "Melyik eszköz tárol adatot?", o: ["SSD", "Egér", "Monitor", "Hangszóró"], a: 0 },
+      { q: "Mi a Wi-Fi fő feladata?", o: ["Vezetéknélküli adatátvitel", "Nyomtatás", "Képalkotás", "Töltés"], a: 0 },
+      { q: "Melyik alkatrész a gép 'agya'?", o: ["Processzor", "HDD", "Videókártya", "Táp"], a: 0 },
+      { q: "Mivel foglalkozik a robotika?", o: ["Robotok tervezésével", "Kertészettel", "Főzéssel", "Sporttal"], a: 0 },
+      { q: "Mit jelent a 3D nyomtatás?", o: ["Térbeli tárgyak létrehozását", "Színes papírnyomtatást", "Gyors fénymásolást", "Fotózást"], a: 0 },
+      { q: "Melyik feszültség van a magyar fali aljzatokban?", o: ["110V", "230V", "400V", "12V"], a: 1 },
+      { q: "Melyik eszköz alakítja a digitális jelet képpé?", o: ["Monitor", "Billentyűzet", "Scanner", "Router"], a: 0 }
     ]
   };
 
