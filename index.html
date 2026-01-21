@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GÉIK Nyílt Nap - Kihívás</title>
   <style>
-    body { font-family: sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
+    body { font-family: sans-serif; background: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; -webkit-tap-highlight-color: transparent; }
     .container { max-width: 450px; margin: 0 auto; }
     canvas { background: white; border-radius: 50%; margin: 20px 0; max-width: 100%; height: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
     
-    button#spin-btn { background: #22c55e; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; color: white; cursor: pointer; transition: 0.2s; }
+    button#spin-btn { background: #22c55e; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; color: white; cursor: pointer; }
     button#spin-btn:disabled { background: #475569; opacity: 0.7; }
     
     #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
@@ -17,16 +17,29 @@
     
     .options-grid { display: grid; gap: 10px; margin-top: 15px; }
     
-    /* Gomb stílusok alaphelyzetben */
-    .option-btn { background: #334155; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer; transition: background 0.2s; outline: none; }
-    
-    /* Csak asztali gépen legyen hover (így mobilon nem ragad be a kék szín) */
+    /* ALAP GOMB STÍLUS */
+    .option-btn { 
+      background: #334155; 
+      border: 1px solid #475569; 
+      color: white; 
+      padding: 12px; 
+      border-radius: 8px; 
+      font-size: 15px; 
+      cursor: pointer; 
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    /* CSAK ASZTALI GÉPEN, HA AZ EGÉR FELÉ ÉR */
     @media (hover: hover) {
       .option-btn:hover { background: #38bdf8; color: #000; }
     }
-    
-    /* Amikor ténylegesen rányomnak (mobilon is) */
-    .option-btn:active { background: #38bdf8; color: #000; }
+
+    /* MOBILON ÉS ASZTALIN IS: CSAK AMÍG NYOMVA TARTOD */
+    .option-btn:active { 
+      background: #38bdf8 !important; 
+      color: #000 !important; 
+    }
 
     .progress { color: #fbbf24; font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
   </style>
@@ -35,7 +48,7 @@
 
   <div class="container">
     <h2 style="margin-top:10px;">🎓 GÉIK Kihívás</h2>
-    <p>Pörgess és válaszolj 3 véletlen kérdésre!</p>
+    <p>3 véletlen kérdés a győzelemért!</p>
     <canvas id="wheel" width="400" height="400"></canvas>
     <div><button id="spin-btn" onclick="spin()">🎡 PÖRGETÉS</button></div>
     <p id="status" style="color:#38bdf8; font-weight:bold; height: 20px;"></p>
@@ -50,7 +63,7 @@
   </div>
 
 <script>
-  // Kérdésbank (8 kategória x 10 kérdés)
+  // Kérdésbank marad a 8x10-es verzió
   const questions = {
     "Logika": [
       { q: "Melyik szám jön: 2, 4, 8, 16... ?", o: ["24", "30", "32", "64"], a: 2 },
@@ -193,12 +206,9 @@
     if (spinning) return;
     spinning = true;
     spinBtn.disabled = true;
-    
-    // TELJES RESET A KÖR ELEJÉN
     correctCount = 0;
     currentStep = 0;
     document.getElementById("status").innerText = "Pörgés...";
-    
     let speed = Math.random() * 0.3 + 0.35;
     function anim() {
       angle += speed;
@@ -219,6 +229,7 @@
     const idx = Math.floor((norm < 0 ? norm + Math.PI * 2 : norm) / slice);
     currentCat = options[idx];
     
+    // Véletlen 3 kérdés kiválasztása
     const allInCat = [...questions[currentCat]];
     sessionQuestions = allInCat.sort(() => Math.random() - 0.5).slice(0, 3);
     
@@ -229,20 +240,29 @@
 
   function showQuestion() {
     const qData = sessionQuestions[currentStep];
+    const container = document.getElementById("m-opts");
+    
+    // Tartalom törlése az új kérdés előtt
+    container.innerHTML = "";
     document.getElementById("progress").innerText = "Kérdés: " + (currentStep + 1) + " / 3 (" + correctCount + " jó)";
     document.getElementById("m-quest").innerText = qData.q;
-    const container = document.getElementById("m-opts");
-    container.innerHTML = ""; // Konténer ürítése
     
     qData.o.forEach((opt, i) => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
       btn.innerText = opt;
-      btn.onclick = () => {
+      btn.onclick = (e) => {
+        // Blur hívása, hogy mobilon ne maradjon "fókuszban" (kék) a gomb
+        e.target.blur();
+        
         if (i === qData.a) correctCount++;
         currentStep++;
-        if (currentStep < 3) showQuestion();
-        else evaluateResult();
+        
+        // Egy minimális késleltetés, hogy a user lássa a kattintást, de a gomb ne ragadjon be
+        setTimeout(() => {
+          if (currentStep < 3) showQuestion();
+          else evaluateResult();
+        }, 100);
       };
       container.appendChild(btn);
     });
@@ -256,12 +276,12 @@
     progText.innerText = "Végeredmény: 3 / " + correctCount + " helyes";
 
     if (correctCount === 3) {
-      qText.innerText = "Tökéletes! Válassz bármit a listáról:";
+      qText.innerText = "Tökéletes! Válassz bármit:";
       allPrizes.forEach(p => createPrizeBtn(p, container));
     } 
     else if (correctCount === 2) {
       const randomPrize = midPrizes[Math.floor(Math.random() * midPrizes.length)];
-      qText.innerText = "Szép munka! A véletlenszerű nyereményed:";
+      qText.innerText = "Szép munka! A véletlen nyereményed:";
       createPrizeBtn(randomPrize, container, true);
     } 
     else if (correctCount === 1) {
@@ -269,7 +289,7 @@
       basicPrizes.forEach(p => createPrizeBtn(p, container));
     } 
     else {
-      qText.innerText = "Sajnos most nem sikerült jó választ adnod.";
+      qText.innerText = "Sajnos nem sikerült jó választ adnod.";
       createPrizeBtn("Vissza a pörgetéshez", container, false, true);
     }
   }
@@ -277,18 +297,14 @@
   function createPrizeBtn(prize, container, isFinal = false, isReset = false) {
     const btn = document.createElement("button");
     btn.className = "option-btn";
-    // Nyeremény választásnál zöld szín
-    if (!isReset) btn.style.background = "#22c55e"; 
-    
+    if (!isReset) btn.style.background = "#22c55e";
     btn.innerText = prize;
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.target.blur();
       if (!isReset) alert("Gratulálunk! Nyereményed: " + prize);
-      
-      // MODAL BEZÁRÁSA ÉS ÁLLAPOT TÖRLÉSE
       document.getElementById("modal-overlay").style.display = "none";
       spinBtn.disabled = false;
       document.getElementById("status").innerText = "";
-      container.innerHTML = ""; // Gombok fizikai törlése
     };
     container.appendChild(btn);
   }
